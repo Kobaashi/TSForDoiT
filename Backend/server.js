@@ -4,12 +4,14 @@ import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import cookieParser from 'cookie-parser';
 
 export const db = new PrismaClient()
 const app = express();
 const PORT = process.env.PORT;
 
 dotenv.config();
+app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 

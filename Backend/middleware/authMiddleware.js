@@ -1,10 +1,13 @@
 import jwt from "jsonwebtoken";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { PrismaClient } from "@prisma/client";
+
+const Prisma = new PrismaClient();
 
 export const verifyJWT = async (req, res, next) => {
   try {
     const token = 
-      req.copkies.accessToken || 
+      req.cookies.accessToken || 
       req.header("Authorization")?.replace("Bearer ", "");
 
     if(!token) {
@@ -16,10 +19,10 @@ export const verifyJWT = async (req, res, next) => {
     const decodedToken = jwt.verify(token, 'secretKey');
     const user = await Prisma.user.findUnique({
       where: {
-        id: decodedToken.userId,
+        user_id: decodedToken.userId,
       },
       select: {
-        id: true,
+        user_id: true,
         email: true,
         name: true,
         created_at: true,

@@ -4,11 +4,12 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DB_URL")
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
+  user_id             Int              @id @default(autoincrement())
+  name           String?           @unique
   email          String           @unique
   password_hash  String
   full_name      String
@@ -21,17 +22,17 @@ model User {
 }
 
 model Language {
-  id             Int              @id @default(autoincrement())
+  language_id             Int              @id @default(autoincrement())
   name           String           @unique
 
   userLanguages  UserLanguage[]
 }
 
 model UserLanguage {
-  id           Int          @id @default(autoincrement())
-  user         User         @relation(fields: [user_id], references: [id])
+  userlanguage_id           Int          @id @default(autoincrement())
+  user         User         @relation(fields: [user_id], references: [user_id])
   user_id      Int
-  language     Language     @relation(fields: [language_id], references: [id])
+  language     Language     @relation(fields: [language_id], references: [language_id])
   language_id  Int
   type         LanguageType
   created_at   DateTime     @default(now())
@@ -45,10 +46,10 @@ enum LanguageType {
 }
 
 model MatchRequest {
-  id            Int          @id @default(autoincrement())
-  from_user     User         @relation("sentRequests", fields: [from_user_id], references: [id])
+  matchrequest_id            Int          @id @default(autoincrement())
+  from_user     User         @relation("sentRequests", fields: [from_user_id], references: [user_id])
   from_user_id  Int
-  to_user       User         @relation("receivedRequests", fields: [to_user_id], references: [id])
+  to_user       User         @relation("receivedRequests", fields: [to_user_id], references: [user_id])
   to_user_id    Int
   status        MatchStatus  @default(pending)
   created_at    DateTime     @default(now())
