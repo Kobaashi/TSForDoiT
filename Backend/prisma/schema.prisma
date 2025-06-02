@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:qwerty@localhost:5432/fordoit"
+}
+
+model User {
+  id    Int    @id @default(autoincrement()) @unique
+  name  String
+  email String @unique
+  password_hash String
+  full_name String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
