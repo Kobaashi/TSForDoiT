@@ -4,15 +4,61 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:qwerty@localhost:5432/fordoit"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id    Int    @id @default(autoincrement()) @unique
-  name  String
-  email String @unique
-  password_hash String
-  full_name String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  password_hash  String
+  full_name      String
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+
+  userLanguages  UserLanguage[]
+  sentRequests   MatchRequest[]   @relation("sentRequests")
+  receivedRequests MatchRequest[] @relation("receivedRequests")
+}
+
+model Language {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+
+  userLanguages  UserLanguage[]
+}
+
+model UserLanguage {
+  id           Int          @id @default(autoincrement())
+  user         User         @relation(fields: [user_id], references: [id])
+  user_id      Int
+  language     Language     @relation(fields: [language_id], references: [id])
+  language_id  Int
+  type         LanguageType
+  created_at   DateTime     @default(now())
+
+  @@unique([user_id, language_id, type])
+}
+
+enum LanguageType {
+  native
+  target
+}
+
+model MatchRequest {
+  id            Int          @id @default(autoincrement())
+  from_user     User         @relation("sentRequests", fields: [from_user_id], references: [id])
+  from_user_id  Int
+  to_user       User         @relation("receivedRequests", fields: [to_user_id], references: [id])
+  to_user_id    Int
+  status        MatchStatus  @default(pending)
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  @@unique([from_user_id, to_user_id])
+}
+
+enum MatchStatus {
+  pending
+  accepted
+  declined
 }

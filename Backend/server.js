@@ -2,10 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
+import authRoutes from './routes/authRoutes.js';
 
 export const db = new PrismaClient()
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT;
 
 dotenv.config();
 app.use(cors());
@@ -26,3 +27,9 @@ async function startServer() {
 }
 
 startServer();
+
+app.get('/', (req, res) => {
+  res.send('Backend server is running');
+})
+
+app.use('/api/auth', authRoutes);
