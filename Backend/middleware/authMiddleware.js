@@ -3,23 +3,26 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { PrismaClient } from "@prisma/client";
 
 const Prisma = new PrismaClient();
+const jwt_secret = process.env.JWT_SECRET
 
 export const verifyJWT = async (req, res, next) => {
   try {
     const token = 
       req.cookies.accessToken || 
       req.header("Authorization")?.replace("Bearer ", "");
-
-    if(!token) {
+    console.log("Token:", token);
+    console.log("Cookies received:", req.cookies);
+    if (!token) {
       return res
         .status(401)
         .json(new ApiResponse(false, 401, {}, "Unauthorized request"));
     }
 
-    const decodedToken = jwt.verify(token, 'secretKey');
+    const decodedToken = jwt.verify(token, jwt_secret);
+
     const user = await Prisma.user.findUnique({
       where: {
-        user_id: decodedToken.userId,
+        user_id: decodedToken.user_id,
       },
       select: {
         user_id: true,
@@ -30,7 +33,7 @@ export const verifyJWT = async (req, res, next) => {
       }
     });
 
-    if(!user) {
+    if (!user) {
       return res
         .status(401)
         .json(new ApiResponse(false, 401, {}, "Invalid Access Token"));
@@ -44,3 +47,4 @@ export const verifyJWT = async (req, res, next) => {
       .json(new ApiResponse(false, 401, null, error.message || "Invalid access token"));
   }
 };
+

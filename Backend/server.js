@@ -12,7 +12,10 @@ const PORT = process.env.PORT;
 
 dotenv.config();
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 app.use(express.json());
 
 async function startServer() {
@@ -36,4 +39,4 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes)
+app.use('/api/users', userRoutes);

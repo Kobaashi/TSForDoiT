@@ -66,6 +66,66 @@ export const updateLanguages = async (req, res) => {
   }
 };
 
-export const filteredByLanguage = async (req, res) => {
-  
+export const searchPartners = async (req, res) => {
+  try {
+    const currentUserId = req.user.user_id;
+    const { native, target } = req.query;
+
+    const nativeLangs = native?.split(",").map(Number).filter(Boolean);
+    const targetLangs = target?.split(",").map(Number).filter(Boolean);
+
+    let users;
+
+    if (nativeLangs?.length > 0 && targetLangs?.length > 0) {
+      users = await db.user.findMany({
+        where: {
+          user_id: { not: currentUserId },
+          userLanguages: {
+            some: {
+              OR: [
+                {
+                  language_id: { in: nativeLangs },
+                  type: 'target'
+                },
+                {
+                  language_id: { in: targetLangs },
+                  type: 'native'
+                }
+              ]
+            }
+          }
+        },
+        include: { userLanguages: true }
+      });
+      users = users.filter(u => {
+        const uNative = u.userLanguages.filter(l => l.type === 'native').map(l => l.language_id);
+        const uTarget = u.userLanguages.filter(l => l.type === 'target').map(l => l.language_id);
+
+        const matchNative = uNative.some(l => targetLangs.includes(l));
+        const matchTarget = uTarget.some(l => nativeLangs.includes(l));
+
+        return matchNative && matchTarget;
+      });
+
+    } else {
+      users = await db.user.findMany({
+        where: {
+          user_id: { not: currentUserId }
+        },
+        include: { userLanguages: true }
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: users
+    });
+  } catch (error) {
+    console.error("filteredUsersByLanguage error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
 }
