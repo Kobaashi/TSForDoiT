@@ -6,6 +6,6 @@ const router = Router();
 
 router.get("/me", getUsers);
 router.put("/me/languages", verifyJWT, updateLanguages);
-router.get("/filter" , verifyJWT, searchPartners);
+router.get("/native/:native/target/:target" , verifyJWT, searchPartners);
 
 export default router;

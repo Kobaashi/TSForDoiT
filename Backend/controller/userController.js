@@ -71,8 +71,11 @@ export const searchPartners = async (req, res) => {
     const currentUserId = req.user.user_id;
     const { native, target } = req.query;
 
-    const nativeLangs = native?.split(",").map(Number).filter(Boolean);
-    const targetLangs = target?.split(",").map(Number).filter(Boolean);
+    const nativeLangs = req.params.native ? [Number(req.params.native)] : [];
+    const targetLangs = req.params.target ? [Number(req.params.target)] : [];
+    console.log("nativeLangs:", nativeLangs);
+    console.log("targetLangs:", targetLangs);
+
 
     let users;
 
@@ -80,31 +83,26 @@ export const searchPartners = async (req, res) => {
       users = await db.user.findMany({
         where: {
           user_id: { not: currentUserId },
-          userLanguages: {
-            some: {
-              OR: [
-                {
-                  language_id: { in: nativeLangs },
-                  type: 'target'
-                },
-                {
+          AND: [
+            {
+              userLanguages: {
+                some: {
                   language_id: { in: targetLangs },
-                  type: 'native'
+                  type: 'native',
                 }
-              ]
+              }
+            },
+            {
+              userLanguages: {
+                some: {
+                  language_id: { in: nativeLangs },
+                  type: 'target',
+                }
+              }
             }
-          }
+          ]
         },
         include: { userLanguages: true }
-      });
-      users = users.filter(u => {
-        const uNative = u.userLanguages.filter(l => l.type === 'native').map(l => l.language_id);
-        const uTarget = u.userLanguages.filter(l => l.type === 'target').map(l => l.language_id);
-
-        const matchNative = uNative.some(l => targetLangs.includes(l));
-        const matchTarget = uTarget.some(l => nativeLangs.includes(l));
-
-        return matchNative && matchTarget;
       });
 
     } else {
@@ -122,10 +120,11 @@ export const searchPartners = async (req, res) => {
       data: users
     });
   } catch (error) {
-    console.error("filteredUsersByLanguage error:", error);
+    console.error("Search Partner error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error"
     });
   }
 }
+
