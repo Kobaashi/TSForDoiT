@@ -1,1 +1,65 @@
-<p>signup works!</p>
+<div class="mx-auto max-w-[150px] mt-10">
+  <h1 class="ml-[70px]">Sign Up</h1>
+  <form (ngSubmit)="registerForm.valid && registerFn()" [formGroup]="registerForm">
+
+    <label for="username">Username:</label>
+    <input class="border-[1px] rounded-[2px]" formControlName="username" type="text" id="username" name="username" required [ngClass]="{error : getControl('username')?.errors && getControl('username')?.touched }">
+    @if(getControl('username')?.errors && getControl('username')?.touched) {
+      @if(getControl('username')?.errors?.['required']) {
+        <label class="text-red-500 ml-[10px]">Username is required!</label>
+      }
+      @if(getControl('username')?.errors?.['maxlength']) {
+        <label class="text-red-500 ml-[10px]">Must be between 8 and 32 characters</label>
+      }
+    }
+
+    <label for="fullname">Fullname:</label>
+    <input class="border-[1px] rounded-[2px]" formControlName="fullname" type="text" id="fullname" name="fullname" required [ngClass]="{error : getControl('fullname')?.errors && getControl('fullname')?.touched }">
+    @if(getControl('fullname')?.errors && getControl('fullname')?.touched) {
+      @if(getControl('fullname')?.errors?.['required']) {
+        <label class="text-red-500 ml-[10px]">Full Name is required!</label>
+      }
+      @if(getControl('fullname')?.errors?.['maxlength']) {
+        <label class="text-red-500 ml-[10px]">Must be between 6 and 32 characters</label>
+      }
+    }
+
+    <label for="email">Email:</label>
+    <input class="border-[1px] rounded-[2px]" formControlName="email" type="email" id="email" name="email" required [ngClass]="{error : getControl('email')?.errors && getControl('email')?.touched }">
+    @if(getControl('email')?.errors && getControl('email')?.touched) {
+      @if(getControl('email')?.errors?.['required']) {
+        <label class="text-red-500 ml-[10px]">Email is required!</label>
+      }
+      @if(getControl('email')?.errors?.['maxlength']) {
+        <label class="text-red-500 ml-[10px]">Only 32 characters are allowed.</label>
+      }
+    }
+
+    <label for="password">Password:</label>
+    <input formControlName="password" class="border-[1px] rounded-[2px]" type="password" id="password" name="password" required [ngClass]="{error : getControl('password')?.errors && getControl('password')?.touched }">
+    @if(getControl('password')?.errors && getControl('password')?.touched) {
+      @if(getControl('password')?.errors?.['required']) {
+        <label class="text-red-500 ml-[10px]">Password is required!</label>
+      }
+      @if(getControl('password')?.errors?.['minlength'] || getControl('password')?.errors?.['maxlength']) {
+        <label class="text-red-500 ml-[10px]">Must be between 8 and 32 characters</label>
+      }
+    }
+
+    <label for="confirmPassword">Confirm Password:</label>
+    <input formControlName="confirmPassword" class="border-[1px] rounded-[2px]" type="password" id="confirmPassword" name="confirmPassword" [ngClass]="{error : getControl('confirmPassword')?.errors && getControl('confirmPassword')?.touched }">
+    @if(getControl('confirmPassword')?.errors && getControl('confirmPassword')?.touched) {
+      @if(getControl('confirmPassword')?.errors?.['required']) {
+        <label class="text-red-500 ml-[10px]">Confirm password is required!</label>
+      }
+      @if(getControl('confirmPassword')?.errors?.['minlength'] || getControl('confirmPassword')?.errors?.['maxlength']) {
+        <label class="text-red-500 ml-[10px]">Must be between 8 and 32 characters</label>
+      }
+    }
+
+    <button class="ml-[70px] mt-[10px] border-[1px] px-[5px] py-[5px] rounded-[2px] cursor-pointer" type="submit" [disabled]="registerForm.invalid || !passwordsMatch()">Sign Up</button>
+    @if(!passwordsMatch()) {
+      <label class="text-red-500">Passwords do not match</label>
+    }
+  </form>
+</div>

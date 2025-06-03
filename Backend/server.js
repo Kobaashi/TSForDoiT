@@ -13,7 +13,7 @@ const PORT = process.env.PORT;
 dotenv.config();
 app.use(cookieParser());
 app.use(cors({
-  origin: true,
+  origin: process.env.frontend_url,
   credentials: true,
 }));
 app.use(express.json());
