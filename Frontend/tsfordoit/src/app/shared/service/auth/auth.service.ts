@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environment/environment';
 import { CookieService } from 'ngx-cookie-service';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RegisterResponse } from '../../interface/registerResponce.interface';
 
@@ -26,9 +26,14 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${this.apiUrl}/api/auth/register`, userData);
   }
 
-  login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/api/auth/login`, credentials, { withCredentials: true });
-  }
+  login(credentials: { email: string; password: string }): Observable<HttpResponse<any>> {
+  return this.http.post<any>(
+    `${this.apiUrl}/api/auth/login`,
+    credentials,
+    { withCredentials: true, observe: 'response' }
+  );
+}
+
 
 
 

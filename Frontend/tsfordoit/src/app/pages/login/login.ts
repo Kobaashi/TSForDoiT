@@ -22,8 +22,8 @@ export class Login {
   logInForm: FormGroup;
 
   constructor(private fb: FormBuilder, 
-    private authService: AuthService, 
-    private router: Router) {
+              private authService: AuthService, 
+              private router: Router) {
     this.logInForm = this.fb.group({
       email: new FormControl("", [Validators.required, Validators.maxLength(32), Validators.minLength(8), Validators.pattern(this.emailRegex)]),
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(32)]],
@@ -31,7 +31,7 @@ export class Login {
   }
 
   getControl(name: any) : AbstractControl | null {
-    return this.logInForm.get(name)
+    return this.logInForm.get(name);
   }
 
   async logInFn() {
@@ -39,31 +39,64 @@ export class Login {
     const password = this.logInForm.get('password')?.value;
 
     try {
-      const response: any = await this.authService.login({ email, password }).toPromise();
-      console.log('Login response:', response);
+      const httpResponse = await this.authService.login({ email, password }).toPromise();
 
-      if (response?.message === 'Login successful' && response?.token) {
-        this.setJwtCookie(response.token);
-        this.router.navigate(['/']);
-
-        console.log('Login successful! JWT saved in cookies.');
-      } else {
-        console.warn('Unexpected response:', response);
+      if (!httpResponse) {
+        console.warn('No response from server');
+        return;
       }
+
+      console.log('Full HTTP response:', httpResponse);
+      console.log('Response body:', httpResponse.body);
+
+      const token = this.getCookie('accessToken');
+
+      if (token) {
+        console.log('JWT token from cookie:', token);
+        const userId = this.getUserIdFromToken(token);
+
+        if (userId) {
+          this.setUserIdCookie(userId);
+          console.log('Decoded user_id:', userId);
+          this.router.navigate(['/']);
+        } else {
+          console.warn('user_id not found in token');
+        }
+      } else {
+        console.warn('Token not found in cookies');
+      }
+
     } catch (error: any) {
       console.error('Login failed:', error?.error?.message || error);
     }
   }
 
-  private setJwtCookie(token: string): void {
-    const expiresDays = 7;
-    const d = new Date();
-    d.setTime(d.getTime() + (expiresDays * 24 * 60 * 60 * 1000));
-    const expires = "expires=" + d.toUTCString();
-
-    document.cookie = `jwt=${token};${expires};path=/;SameSite=Lax`;
-
-    window.location.reload();
+  private getCookie(name: string): string | null {
+    const matches = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
+    return matches ? decodeURIComponent(matches[1]) : null;
   }
 
+  private getUserIdFromToken(token: string): string | null {
+    try {
+      const payloadBase64 = token.split('.')[1];
+      const payloadJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+      const payload = JSON.parse(payloadJson);
+
+      console.log('JWT payload:', payload);
+
+      return payload.user_id || null;
+    } catch (e) {
+      console.error('Failed to decode JWT payload', e);
+      return null;
+    }
+  }
+
+  private setUserIdCookie(userId: string): void {
+    const expiresDays = 7;
+    const d = new Date();
+    d.setTime(d.getTime() + expiresDays * 24 * 60 * 60 * 1000);
+    const expires = "expires=" + d.toUTCString();
+
+    document.cookie = `user_id=${userId};${expires};path=/;SameSite=Lax`;
+  }
 }
