@@ -1,1 +1,34 @@
 <p>searchpartners works!</p>
+
+<label for="native">Native:</label>
+<input class="border-[1px] rounded-[2px]" type="text" id="native" [(ngModel)]="native" name="native" required>
+
+<label for="target">Target:</label>
+<input class="border-[1px] rounded-[2px]" type="text" id="target" [(ngModel)]="target" name="target" required>
+
+<button (click)="searchPartners()">Search</button>
+
+<div>
+  @for (res of results; track res.user_id) {
+    <div class="result-item border p-2 my-2 rounded">
+      <h1><strong>Name:</strong> {{ res.name }}</h1>
+      <p><strong>Email:</strong> {{ res.email }}</p>
+
+      <p><strong>Native Languages:</strong></p>
+      <ul>
+        @for (lang of getNativeLanguages(res); track lang.language_id) {
+          <li>{{ lang.language?.name || lang.language_id }}</li>
+        }
+      </ul>
+
+      <p><strong>Target Languages:</strong></p>
+      <ul>
+        @for (lang of getTargetLanguages(res); track lang.language_id) {
+          <li>{{ lang.language?.name || lang.language_id }}</li>
+        }
+      </ul>
+    </div>
+  }
+</div>
+
+

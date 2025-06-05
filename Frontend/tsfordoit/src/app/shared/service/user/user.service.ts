@@ -11,13 +11,8 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
-  searchPartner(native: number, target: number) {
-    return this.http.get(`${this.apiUrl}/api/users`, {
-      params: {
-        native: native.toString(),
-        target: target.toString()
-      }
-    });
-  }
+  // searchPartner(native: string, target: string) {
+  //   return this.http.get(`${this.apiUrl}/api/users/native/${native}/target/${target}`, { withCredentials: true });
+  // }
 
 }
