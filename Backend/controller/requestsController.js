@@ -1,3 +1,4 @@
+import { MatchStatus } from "@prisma/client";
 import { db } from "../server.js";
 
 export const postRequest = async (req, res) => {
@@ -49,3 +50,49 @@ export const postRequest = async (req, res) => {
     });
   }
 }
+
+export const getAllRequestsByUserId = async (req, res) => {
+  const user_id = req.user?.user_id;
+
+  if (!user_id) {
+    return res.status(400).json({ success: false, message: "User ID is required" });
+  }
+
+  try {
+    const pendingRequests = await db.matchRequest.findMany({
+      where: {
+        to_user_id: user_id,
+        status: MatchStatus.pending 
+      },
+      include: {
+        to_user: {
+          select: {
+            user_id: true,
+            name: true,
+            full_name: true,
+            email: true,
+          }
+        },
+        from_user: {            
+          select: {
+            user_id: true,
+            name: true,
+            full_name: true,
+            email: true,
+          }
+        }
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: pendingRequests,
+      message: "Pending incoming requests retrieved successfully"
+    });
+
+  } catch (error) {
+    console.error("getIncomingPendingRequests error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+

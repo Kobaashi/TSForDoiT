@@ -27,9 +27,25 @@
           <li>{{ lang.language?.name || lang.language_id }}</li>
         }
       </ul>
+
+      <button (click)="sendRequest(res.user_id)">Send Request</button>
+      <br>
     </div>
-    <button (click)="sendRequest(res.user_id)">Send Request</button>
   }
 </div>
+<div>
+  <button (click)="toogleActive()">View all request with status pending</button>
 
-
+  @if(isActive === true) {
+    <div>
+      @for(res of resultsPending; track res) {
+        <div class="result-item border p-2 my-2 rounded">
+          <h1>Request for you</h1>
+          <p><strong>Request from:</strong> {{ res.from_user.name }}</p>
+          <p><strong>Request to:</strong> {{ res.to_user.name }}</p>
+          <p><strong>Email:</strong> {{ res.from_user.email }}</p>    
+        </div>
+      }
+    </div>
+  }
+</div>

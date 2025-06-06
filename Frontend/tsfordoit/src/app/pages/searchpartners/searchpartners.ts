@@ -16,6 +16,8 @@ export class Searchpartners {
   native: string = '';
   target: string = '';  
   results: any[] = [];
+  resultsPending: any[] = [];
+  isActive: boolean = false;
 
   constructor(private http: HttpClient) {}
 
@@ -83,6 +85,27 @@ export class Searchpartners {
       });
   }
 
+  getAllPendingRequests() {
+    const user_id = Number(this.getCookie('user_id'));
+    if (!user_id) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    const apiUrl = `${environment.apiUrl}/api/req/requests/incoming`;
+
+    this.http.get<any>(apiUrl, { withCredentials: true })
+      .subscribe({
+        next: (response) => {
+          this.resultsPending = response.data.filter( (req: any) => req.to_user_id === user_id && req.status === Status.PENDING);
+          console.log('Pending requests:', this.resultsPending);
+        },
+        error: (error) => {
+          console.error('Error fetching pending requests:', error);
+        }
+      });
+  }
+
   protected getCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
     const matches = document.cookie.match(
@@ -91,5 +114,13 @@ export class Searchpartners {
     return matches ? decodeURIComponent(matches[1]) : null;
   }
 
+  toogleActive() {
+    this.isActive = !this.isActive;
+    if (this.isActive) {
+      this.getAllPendingRequests();
+    } else {
+      this.resultsPending = [];
+    }
+  }
 
 }
