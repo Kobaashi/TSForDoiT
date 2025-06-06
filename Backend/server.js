@@ -1,10 +1,11 @@
-import express from 'express';
+import express, { request } from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import cookieParser from 'cookie-parser';
+import requestRoutes from './routes/requestRoutes.js';
 
 export const db = new PrismaClient()
 const app = express();
@@ -40,3 +41,4 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/req', requestRoutes);

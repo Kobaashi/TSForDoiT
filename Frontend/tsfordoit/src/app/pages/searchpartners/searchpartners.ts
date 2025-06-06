@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environment/environment';
+import { Status } from '../../shared/enum/status';
 
 @Component({
   selector: 'app-searchpartners',
@@ -41,16 +42,48 @@ export class Searchpartners {
       });
   }
 
-    getNativeLanguages(user: any): any[] {
-      return user.userLanguages.filter((l: any) => l.type === 'native');
-    }
+  getNativeLanguages(user: any): any[] {
+    return user.userLanguages.filter((l: any) => l.type === 'native');
+  }
 
   getTargetLanguages(user: any): any[] {
     return user.userLanguages.filter((l: any) => l.type === 'target');
   }
 
+  sendRequest(to_user_id: number) {
+    const from_user_id = Number(this.getCookie('user_id'));
+     if (!from_user_id) {
+      console.error('User not authenticated');
+      return;
+    }
 
-  private getCookie(name: string): string | null {
+    if (!to_user_id) {
+      console.error('to_user_id is undefined or null');
+      return;
+    }
+
+    const apiUrl = `${environment.apiUrl}/api/req/requests`
+
+    const body = {
+      from_user_id: from_user_id,
+      to_user_id: to_user_id,
+      status: Status.PENDING
+    }
+
+    console.log('Sending request with body:', body);
+
+    this.http.post<any>(apiUrl, body, { withCredentials: true })
+      .subscribe({
+        next: (response) => {
+          console.log('Request sent successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error sending request:', error);
+        }
+      });
+  }
+
+  protected getCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
     const matches = document.cookie.match(
       new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)')
