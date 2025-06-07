@@ -11,7 +11,7 @@
 <div>
   @for (res of results; track res.user_id) {
     <div class="result-item border p-2 my-2 rounded">
-      <h1><strong>Name:</strong> {{ res.name }}</h1>
+      <h1><strong>Name:</strong> {{ res.full_name }}</h1>
       <p><strong>Email:</strong> {{ res.email }}</p>
 
       <p><strong>Native Languages:</strong></p>
@@ -35,7 +35,7 @@
 </div>
 
 <div>
-  <button (click)="toogleActivePendingFor()">View all requests for you</button>
+  <button (click)="toogleActivePendingFor()">Show all requests for you</button>
 
   @if(isActivePendingFor === true) {
     <div>
@@ -52,7 +52,7 @@
 </div>
 
 <div class="mt-4">
-  <button (click)="toogleActivePendingFrom()">View all requests from you</button>
+  <button (click)="toogleActivePendingFrom()">Show all requests from you</button>
 
   @if(isActivePendingFrom === true) {
     <div>
@@ -69,11 +69,28 @@
 </div>
 
 <div class="mt-4">
-  <button (click)="toogleActiveAccept()">View all accept requests from you</button>
+  <button (click)="toogleActiveAccept()">Show all the ones you've accepted</button>
 
   @if(isActiveAccept === true) {
     <div>
       @for(res of resultsAcceptedFor; track res) {
+        <div class="result-item border p-2 my-2 rounded">
+          <h1>Request for you</h1>
+          <p><strong>Request from:</strong> {{ res.from_user.full_name }}</p>
+          <p><strong>Request to:</strong> {{ res.to_user.full_name }}</p>
+          <p><strong>Email:</strong> {{ res.to_user.email }}</p>    
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<div class="mt-4">
+  <button (click)="toogleActiveDecline()">Show all the ones you've declined</button>
+
+  @if(isActiveDecline === true) {
+    <div>
+      @for(res of resultsDeclinedFor; track res) {
         <div class="result-item border p-2 my-2 rounded">
           <h1>Request for you</h1>
           <p><strong>Request from:</strong> {{ res.from_user.full_name }}</p>

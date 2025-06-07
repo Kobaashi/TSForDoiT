@@ -19,9 +19,11 @@ export class Searchpartners {
   resultsPendingFor: any[] = [];
   resultsPendingFrom: any[] = [];
   resultsAcceptedFor: any[] = [];
+  resultsDeclinedFor: any[] = [];
   isActivePendingFor: boolean = false;
   isActivePendingFrom: boolean = false;
   isActiveAccept: boolean = false;
+  isActiveDecline: boolean = false;
 
   constructor(private http: HttpClient) {}
 
@@ -62,6 +64,8 @@ export class Searchpartners {
       console.error('User not authenticated');
       return;
     }
+
+    
 
     if (!to_user_id) {
       console.error('to_user_id is undefined or null');
@@ -153,6 +157,28 @@ export class Searchpartners {
       });
   }
 
+  getAllDeclinedRequestsFor() {
+    const user_id = Number(this.getCookie('user_id'));
+    
+    if (!user_id) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    const apiUrl = `${environment.apiUrl}/api/req/requests/decline`;
+
+    this.http.get<any>(apiUrl, { withCredentials: true })
+      .subscribe({
+        next: (response) => {
+          this.resultsDeclinedFor = response.data.filter( (req: any) => req.to_user_id === user_id && req.status === Status.DECLINED);
+          console.log('Pending requests for:', this.resultsDeclinedFor);
+        },
+        error: (error) => {
+          console.error('Error fetching pending requests:', error);
+        }
+      });
+  }
+
   protected getCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
     const matches = document.cookie.match(
@@ -185,6 +211,15 @@ export class Searchpartners {
         this.getAllAcceptedRequestsFor();
       } else {
         this.resultsAcceptedFor = [];
+      }
+    }
+
+    toogleActiveDecline() {
+      this.isActiveDecline = !this.isActiveDecline;
+      if (this.isActiveDecline) {
+        this.getAllDeclinedRequestsFor();
+      } else {
+        this.resultsDeclinedFor = [];
       }
     }
 }

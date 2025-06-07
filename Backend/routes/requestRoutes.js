@@ -4,6 +4,7 @@ import {
   getAllRequestsPendingFromUser,
   getAllAcceptedRequestsByUserId,
   changeRequestStatusToDecline,
+  getAllDeclinedRequestsByUserId,
   postPendingRequest,
   changeRequestStatusToAccepted,  
 } from "../controller/requestsController.js";
@@ -17,5 +18,6 @@ router.put("/requests/:id/decline", authenticate, changeRequestStatusToDecline);
 router.get("/requests/incoming", authenticate, getAllRequestsPendingToUser);
 router.get("/requests/outcoming", authenticate, getAllRequestsPendingFromUser);
 router.get("/requests/accept", authenticate, getAllAcceptedRequestsByUserId);
+router.get("/requests/decline", authenticate, getAllDeclinedRequestsByUserId);
 
 export default router;
