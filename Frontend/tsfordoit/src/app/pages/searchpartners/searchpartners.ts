@@ -65,7 +65,7 @@ export class Searchpartners {
       return;
     }
 
-    
+
 
     if (!to_user_id) {
       console.error('to_user_id is undefined or null');
@@ -83,6 +83,76 @@ export class Searchpartners {
     console.log('Sending request with body:', body);
 
     this.http.post<any>(apiUrl, body, { withCredentials: true })
+      .subscribe({
+        next: (response) => {
+          console.log('Request sent successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error sending request:', error);
+        }
+      });
+  }
+
+  acceptRequest(matchrequest_id: number) {
+    const from_user_id = Number(this.getCookie('user_id'));
+     if (!from_user_id) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    const to_user_id = Number(this.resultsPendingFor.find(req => req.to_user_id === from_user_id)?.to_user_id);
+
+    if (!to_user_id) {
+      console.error('to_user_id is undefined or null');
+      return;
+    }
+
+    const apiUrl = `${environment.apiUrl}/api/req/requests/${matchrequest_id}/accept`
+
+    const body = {
+      from_user_id: from_user_id,
+      to_user_id: to_user_id,
+      status: Status.ACCEPTED
+    }
+
+    console.log('Sending request with body:', body);
+
+    this.http.put<any>(apiUrl, body, { withCredentials: true })
+      .subscribe({
+        next: (response) => {
+          console.log('Request sent successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error sending request:', error);
+        }
+      });
+  }
+
+  declineRequest(matchrequest_id: number) {
+    const from_user_id = Number(this.getCookie('user_id'));
+     if (!from_user_id) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    const to_user_id = Number(this.resultsPendingFor.find(req => req.to_user_id === from_user_id)?.to_user_id);
+
+    if (!to_user_id) {
+      console.error('to_user_id is undefined or null');
+      return;
+    }
+
+    const apiUrl = `${environment.apiUrl}/api/req/requests/${matchrequest_id}/decline`
+
+    const body = {
+      from_user_id: from_user_id,
+      to_user_id: to_user_id,
+      status: Status.DECLINED
+    }
+
+    console.log('Sending request with body:', body);
+
+    this.http.put<any>(apiUrl, body, { withCredentials: true })
       .subscribe({
         next: (response) => {
           console.log('Request sent successfully:', response);

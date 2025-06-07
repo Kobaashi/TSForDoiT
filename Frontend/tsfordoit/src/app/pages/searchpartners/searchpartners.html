@@ -45,6 +45,9 @@
           <p><strong>Request from:</strong> {{ res.from_user.full_name }}</p>
           <p><strong>Request to:</strong> {{ res.to_user.full_name }}</p>
           <p><strong>Email:</strong> {{ res.from_user.email }}</p>    
+
+          <button (click)="acceptRequest(res.matchrequest_id)" >Accept</button>
+          <button class="ml-5" (click)="declineRequest(res.matchrequest_id)">Decline</button>
         </div>
       }
     </div>
