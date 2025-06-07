@@ -16,8 +16,10 @@ export class Searchpartners {
   native: string = '';
   target: string = '';  
   results: any[] = [];
-  resultsPending: any[] = [];
-  isActive: boolean = false;
+  resultsPendingFor: any[] = [];
+  resultsPendingFrom: any[] = [];
+  isActivePendingFor: boolean = false;
+  isActiveAcceptedFrom: boolean = false;
 
   constructor(private http: HttpClient) {}
 
@@ -64,7 +66,7 @@ export class Searchpartners {
       return;
     }
 
-    const apiUrl = `${environment.apiUrl}/api/req/requests`
+    const apiUrl = `${environment.apiUrl}/api/req/requests/pending`
 
     const body = {
       from_user_id: from_user_id,
@@ -85,7 +87,7 @@ export class Searchpartners {
       });
   }
 
-  getAllPendingRequests() {
+  getAllPendingRequestsFor() {
     const user_id = Number(this.getCookie('user_id'));
     if (!user_id) {
       console.error('User not authenticated');
@@ -97,14 +99,35 @@ export class Searchpartners {
     this.http.get<any>(apiUrl, { withCredentials: true })
       .subscribe({
         next: (response) => {
-          this.resultsPending = response.data.filter( (req: any) => req.to_user_id === user_id && req.status === Status.PENDING);
-          console.log('Pending requests:', this.resultsPending);
+          this.resultsPendingFor = response.data.filter( (req: any) => req.to_user_id === user_id && req.status === Status.PENDING);
+          console.log('Pending requests for:', this.resultsPendingFor);
         },
         error: (error) => {
           console.error('Error fetching pending requests:', error);
         }
       });
   }
+
+  getAllPendingRequestsFrom() {
+      const user_id = Number(this.getCookie('user_id'));
+      if (!user_id) {
+        console.error('User not authenticated');
+        return;
+      }
+
+      const apiUrl = `${environment.apiUrl}/api/req/requests/outcoming`;
+
+      this.http.get<any>(apiUrl, { withCredentials: true })
+        .subscribe({
+          next: (response) => {
+            this.resultsPendingFrom = response.data.filter( (req: any) => req.from_user_id === user_id && req.status === Status.PENDING);
+            console.log('Pending requests from:', this.resultsPendingFrom);
+          },
+          error: (error) => {
+            console.error('Error fetching pending requests:', error);
+          }
+        });
+    }
 
   protected getCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
@@ -114,12 +137,21 @@ export class Searchpartners {
     return matches ? decodeURIComponent(matches[1]) : null;
   }
 
-  toogleActive() {
-    this.isActive = !this.isActive;
-    if (this.isActive) {
-      this.getAllPendingRequests();
+  toogleActivePendingFor() {
+    this.isActivePendingFor = !this.isActivePendingFor;
+    if (this.isActivePendingFor) {
+      this.getAllPendingRequestsFor();
     } else {
-      this.resultsPending = [];
+      this.resultsPendingFor = [];
+    }
+  }
+
+  toogleActivePendingFrom() {
+    this.isActiveAcceptedFrom = !this.isActiveAcceptedFrom;
+    if (this.isActiveAcceptedFrom) {
+      this.getAllPendingRequestsFrom();
+    } else {
+      this.resultsPendingFrom = [];
     }
   }
 
