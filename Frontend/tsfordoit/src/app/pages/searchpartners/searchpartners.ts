@@ -18,8 +18,10 @@ export class Searchpartners {
   results: any[] = [];
   resultsPendingFor: any[] = [];
   resultsPendingFrom: any[] = [];
+  resultsAcceptedFor: any[] = [];
   isActivePendingFor: boolean = false;
-  isActiveAcceptedFrom: boolean = false;
+  isActivePendingFrom: boolean = false;
+  isActiveAccept: boolean = false;
 
   constructor(private http: HttpClient) {}
 
@@ -129,6 +131,28 @@ export class Searchpartners {
         });
     }
 
+    getAllAcceptedRequestsFor() {
+    const user_id = Number(this.getCookie('user_id'));
+    
+    if (!user_id) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    const apiUrl = `${environment.apiUrl}/api/req/requests/accept`;
+
+    this.http.get<any>(apiUrl, { withCredentials: true })
+      .subscribe({
+        next: (response) => {
+          this.resultsAcceptedFor = response.data.filter( (req: any) => req.to_user_id === user_id && req.status === Status.ACCEPTED);
+          console.log('Pending requests for:', this.resultsAcceptedFor);
+        },
+        error: (error) => {
+          console.error('Error fetching pending requests:', error);
+        }
+      });
+  }
+
   protected getCookie(name: string): string | null {
     if (typeof document === 'undefined') return null;
     const matches = document.cookie.match(
@@ -147,12 +171,20 @@ export class Searchpartners {
   }
 
   toogleActivePendingFrom() {
-    this.isActiveAcceptedFrom = !this.isActiveAcceptedFrom;
-    if (this.isActiveAcceptedFrom) {
+    this.isActivePendingFrom = !this.isActivePendingFrom;
+    if (this.isActivePendingFrom) {
       this.getAllPendingRequestsFrom();
     } else {
       this.resultsPendingFrom = [];
     }
   }
 
+    toogleActiveAccept() {
+      this.isActiveAccept = !this.isActiveAccept;
+      if (this.isActiveAccept) {
+        this.getAllAcceptedRequestsFor();
+      } else {
+        this.resultsAcceptedFor = [];
+      }
+    }
 }

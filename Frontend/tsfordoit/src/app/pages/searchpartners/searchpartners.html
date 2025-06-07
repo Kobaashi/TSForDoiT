@@ -50,12 +50,30 @@
     </div>
   }
 </div>
+
 <div class="mt-4">
   <button (click)="toogleActivePendingFrom()">View all requests from you</button>
 
-  @if(isActiveAcceptedFrom === true) {
+  @if(isActivePendingFrom === true) {
     <div>
       @for(res of resultsPendingFrom; track res) {
+        <div class="result-item border p-2 my-2 rounded">
+          <h1>Request for you</h1>
+          <p><strong>Request from:</strong> {{ res.from_user.full_name }}</p>
+          <p><strong>Request to:</strong> {{ res.to_user.full_name }}</p>
+          <p><strong>Email:</strong> {{ res.to_user.email }}</p>    
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<div class="mt-4">
+  <button (click)="toogleActiveAccept()">View all accept requests from you</button>
+
+  @if(isActiveAccept === true) {
+    <div>
+      @for(res of resultsAcceptedFor; track res) {
         <div class="result-item border p-2 my-2 rounded">
           <h1>Request for you</h1>
           <p><strong>Request from:</strong> {{ res.from_user.full_name }}</p>
