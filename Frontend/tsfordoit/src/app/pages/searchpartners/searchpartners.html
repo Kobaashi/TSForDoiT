@@ -9,28 +9,32 @@
 <button (click)="searchPartners()">Search</button>
 
 <div>
-  @for (res of results; track res.user_id) {
-    <div class="result-item border p-2 my-2 rounded">
-      <h1><strong>Name:</strong> {{ res.full_name }}</h1>
-      <p><strong>Email:</strong> {{ res.email }}</p>
+  @if(results.length > 0) {
+      @for (res of results; track res.user_id) {
+      <div class="result-item border p-2 my-2 rounded">
+        <h1><strong>Name:</strong> {{ res.full_name }}</h1>
+        <p><strong>Email:</strong> {{ res.email }}</p>
 
-      <p><strong>Native Languages:</strong></p>
-      <ul>
-        @for (lang of getNativeLanguages(res); track lang.language_id) {
-          <li>{{ lang.language?.name || lang.language_id }}</li>
-        }
-      </ul>
+        <p><strong>Native Languages:</strong></p>
+        <ul>
+          @for (lang of getNativeLanguages(res); track lang.language_id) {
+            <li>{{ lang.language?.name || lang.language_id }}</li>
+          }
+        </ul>
 
-      <p><strong>Target Languages:</strong></p>
-      <ul>
-        @for (lang of getTargetLanguages(res); track lang.language_id) {
-          <li>{{ lang.language?.name || lang.language_id }}</li>
-        }
-      </ul>
+        <p><strong>Target Languages:</strong></p>
+        <ul>
+          @for (lang of getTargetLanguages(res); track lang.language_id) {
+            <li>{{ lang.language?.name || lang.language_id }}</li>
+          }
+        </ul>
 
-      <button (click)="sendRequest(res.user_id)">Send Request</button>
-      <br>
-    </div>
+        <button class="border-[1px] px-[5px] py-[5px] rounded-[2px] cursor-pointer" (click)="sendRequest(res.user_id)">Send Request</button>
+        <br>
+      </div>
+    } 
+  } @else {
+      <p class="ml-50">No results found.</p>
   }
 </div>
 
@@ -38,7 +42,8 @@
   <button (click)="toogleActivePendingFor()">Show all requests for you</button>
 
   @if(isActivePendingFor === true) {
-    <div>
+    @if(resultsPendingFor.length > 0) {
+        <div>
       @for(res of resultsPendingFor; track res) {
         <div class="result-item border p-2 my-2 rounded">
           <h1>Request for you</h1>
@@ -46,19 +51,23 @@
           <p><strong>Request to:</strong> {{ res.to_user.full_name }}</p>
           <p><strong>Email:</strong> {{ res.from_user.email }}</p>    
 
-          <button (click)="acceptRequest(res.matchrequest_id)" >Accept</button>
-          <button class="ml-5" (click)="declineRequest(res.matchrequest_id)">Decline</button>
+          <button class="border-[1px] px-[5px] py-[5px] rounded-[2px] cursor-pointer" (click)="acceptRequest(res.matchrequest_id)" >Accept</button>
+          <button class="ml-5 border-[1px] px-[5px] py-[5px] rounded-[2px] cursor-pointer" (click)="declineRequest(res.matchrequest_id)">Decline</button>
         </div>
       }
     </div>
+    } @else {
+    <p class="ml-50">No pending requests for you.</p>
   }
+  } 
 </div>
 
 <div class="mt-4">
   <button (click)="toogleActivePendingFrom()">Show all requests from you</button>
 
   @if(isActivePendingFrom === true) {
-    <div>
+    @if(resultsPendingFrom.length > 0) {
+        <div>
       @for(res of resultsPendingFrom; track res) {
         <div class="result-item border p-2 my-2 rounded">
           <h1>Request for you</h1>
@@ -68,14 +77,18 @@
         </div>
       }
     </div>
+    } @else {
+    <p class="ml-50">No pending requests from you.</p>
   }
+  } 
 </div>
 
 <div class="mt-4">
   <button (click)="toogleActiveAccept()">Show all the ones you've accepted</button>
 
   @if(isActiveAccept === true) {
-    <div>
+    @if(resultsAcceptedFor.length > 0) {
+        <div>
       @for(res of resultsAcceptedFor; track res) {
         <div class="result-item border p-2 my-2 rounded">
           <h1>Request for you</h1>
@@ -85,14 +98,18 @@
         </div>
       }
     </div>
+    } @else {
+    <p class="ml-50">No accepted requests.</p>
   }
+  } 
 </div>
 
 <div class="mt-4">
   <button (click)="toogleActiveDecline()">Show all the ones you've declined</button>
 
   @if(isActiveDecline === true) {
-    <div>
+    @if(resultsDeclinedFor.length > 0) {
+        <div>
       @for(res of resultsDeclinedFor; track res) {
         <div class="result-item border p-2 my-2 rounded">
           <h1>Request for you</h1>
@@ -102,5 +119,8 @@
         </div>
       }
     </div>
+    } @else {
+    <p class="ml-50">No declined requests.</p>
   }
+  } 
 </div>
